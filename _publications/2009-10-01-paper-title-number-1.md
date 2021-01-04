@@ -2,7 +2,7 @@
 title: "Transfer Learning Code Vectorizer based Machine Learning Models for Software Defect Prediction"
 collection: publications
 permalink: /publication/2009-10-01-paper-title-number-1
-excerpt: "This paper is about the number 1. The number 2 is left for future work."
+excerpt:
 date: 2020-09-18
 venue: " 2020 International Conference on Computational Performance Evaluation (ComPE)"
 paperurl: "https://ieeexplore.ieee.org/document/9200076"
