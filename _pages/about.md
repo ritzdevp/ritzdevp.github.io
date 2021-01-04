@@ -15,3 +15,7 @@ I did my B.Tech from Delhi Technological University (DTU) in Electrical and Elec
 <!-- ## For more info
 
 More info about configuring academicpages can be found in [the guide](https://academicpages.github.io/markdown/). The [guides for the Minimal Mistakes theme](https://mmistakes.github.io/minimal-mistakes/docs/configuration/) (which this theme was forked from) might also be helpful. -->
+
+## Updates
+
+18 Sept 2020: Published paper on Transfer Learning Code Vectorizer. [paper](https://ieeexplore.ieee.org/document/9200076) [code][https://github.com/ritzdevp/tl-code-vectorizer]
