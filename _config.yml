@@ -84,8 +84,8 @@ author:
   location: "Pittsburgh, Pennsylvania"
   employer:
   pubmed: ""
-  googlescholar: "https://scholar.google.com/citations?hl=en&user=uwTDDBMAAAAJ&view_op=list_works&gmla=AJsN-F7Uh5diQbHymF-qNQWUyuUY2OwPRmGaHc54Gn9pKyYabfo02CgMSHC0YMgIojZ5JKo9HCvHejKjFqpwEoSp4aXZfQXpGwoKDb1U9Hw8Ll41ey3cdFw"
-  email: "rtjsingh30@gmail.com"
+  googlescholar: "https://scholar.google.com/citations?user=uwTDDBMAAAAJ&hl=en"
+  email: "riturajs@andrew.cmu.edu"
   researchgate: # example: "https://www.researchgate.net/profile/yourprofile"
   uri:
   bitbucket:
@@ -94,20 +94,20 @@ author:
   flickr:
   facebook:
   foursquare:
-  github: "https://github.com/ritzdevp"
+  github: "ritzdevp"
   google_plus:
   keybase:
   instagram:
   impactstory: #"https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm:
-  linkedin: "https://www.linkedin.com/in/riturajsinghcmu/"
-  orcid: "http://orcid.org/yourorcidurl"
+  linkedin: "riturajsinghcmu/"
+  orcid:
   pinterest:
   soundcloud:
-  stackoverflow: # http://stackoverflow.com/users/123456/username
+  stackoverflow:
   steam:
   tumblr:
-  twitter: "replacethistwitterhandle"
+  twitter:
   vine:
   weibo:
   xing:
