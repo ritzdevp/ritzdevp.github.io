@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-I am a Master's student in Computer Engineering at Carnegie Mellon. My focus is towards Machine Learning and Natural Language Processing. Prior to joining CMU, I was a Software Engineer at Accolite where I worked on the mobile backend development team. During the summer of 2019, I was a Software Engineering Intern at Xilinx where my research was focused on acceleration of post-silicon validation driven by ML.
+I am a Master's student in Electrical and Computer Engineering at Carnegie Mellon University. My focus is towards Machine Learning and Natural Language Processing. Prior to joining CMU, I was a Software Engineer at Accolite where I worked on the mobile backend development team. During the summer of 2019, I was a Software Engineering Intern at Xilinx where my research was focused on acceleration of post-silicon validation driven by ML.
 
 I did my B.Tech from Delhi Technological University (DTU) in Electrical and Electronics Engineering. At DTU, I worked in the Computer Science department under the supervision of Dr. Ruchika Malhotra. My undergrad research project was on deep learning assisted software defect prediction.
 
