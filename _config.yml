@@ -80,12 +80,12 @@ analytics:
 author:
   name: "Rituraj Singh"
   avatar: "profile.png"
-  bio: "Master's student at Carnegie Mellon University."
-  location: "Location"
+  bio: "Master's at Carnegie Mellon University."
+  location: "Pittsburgh, Pennsylvania"
   employer:
-  pubmed: "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
-  googlescholar: "http://yourfullgooglescholarurl.com"
-  email:
+  pubmed: ""
+  googlescholar: "https://scholar.google.com/citations?hl=en&user=uwTDDBMAAAAJ&view_op=list_works&gmla=AJsN-F7Uh5diQbHymF-qNQWUyuUY2OwPRmGaHc54Gn9pKyYabfo02CgMSHC0YMgIojZ5JKo9HCvHejKjFqpwEoSp4aXZfQXpGwoKDb1U9Hw8Ll41ey3cdFw"
+  email: "rtjsingh30@gmail.com"
   researchgate: # example: "https://www.researchgate.net/profile/yourprofile"
   uri:
   bitbucket:
@@ -94,13 +94,13 @@ author:
   flickr:
   facebook:
   foursquare:
-  github: "academicpages"
+  github: "https://github.com/ritzdevp"
   google_plus:
   keybase:
   instagram:
   impactstory: #"https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm:
-  linkedin:
+  linkedin: "https://www.linkedin.com/in/riturajsinghcmu/"
   orcid: "http://orcid.org/yourorcidurl"
   pinterest:
   soundcloud:
