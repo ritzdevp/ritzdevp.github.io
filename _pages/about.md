@@ -8,9 +8,12 @@ redirect_from:
   - /about.html
 ---
 
-I am a Master's student in Electrical and Computer Engineering at [Carnegie Mellon University](https://www.cmu.edu/). My focus is towards Machine Learning and Natural Language Processing. Prior to joining CMU, I was a Software Engineer at [Accolite](https://www.accolite.com/) where I worked on the mobile backend development team. During the summer of 2019, I was a Software Engineering Intern at [Xilinx](https://www.xilinx.com/) where my research was focused on acceleration of post-silicon validation driven by ML.
+I am a Master's student in Electrical and Computer Engineering at [Carnegie Mellon University](https://www.cmu.edu/). My focus is towards Deep Learning and Natural Language Processing. I am currently working as a Software Engineer Intern at [Nutanix Inc](https://www.nutanix.com/) where I am developing Nutanix's [Container Storage Interface](https://kubernetes-csi.github.io/docs/) (CSI) for [Kubernetes](https://kubernetes.io/) on [Amazon Elastic Kubernetes Services](https://aws.amazon.com/eks/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc&eks-blogs.sort-by=item.additionalFields.createdDate&eks-blogs.sort-order=desc) (EKS). 
 
-I did my B.Tech from Delhi Technological University (DTU) in Electrical and Electronics Engineering. At DTU, I worked in the Dept. of Computer Science under the supervision of [Dr. Ruchika Malhotra](https://scholar.google.co.in/citations?user=gQrxcioAAAAJ&hl=en). My undergrad research project was on deep learning assisted software defect prediction.
+Prior to joining CMU, I was a Software Engineer at [Accolite](https://www.accolite.com/) where I worked on the mobile backend development team. During the summer of 2019, I was a Software Engineering Intern at [Xilinx](https://www.xilinx.com/) where my research was focused on acceleration of post-silicon validation driven by ML.
+
+I did my B.Tech from Delhi Technological University (DTU) in Electrical and Electronics Engineering. At DTU, I worked in the Dept. of Computer Science under the supervision of [Dr. Ruchika Malhotra](https://scholar.google.co.in/citations?user=gQrxcioAAAAJ&hl=en). 
+My undergrad research project was on deep learning assisted software defect prediction.
 
 <!-- ## For more info
 
