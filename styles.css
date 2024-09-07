@@ -1,0 +1,163 @@
+/* General styles for the portfolio */
+
+html, body {
+    height: 100%; /* Make sure the body takes the full height */
+    margin: 0; /* Remove default margin */
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Use Roboto font */
+    line-height: 1.6;
+    background-color: #ffffff; /* White background */
+    color: #333; /* Default text color */
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    min-height: 100vh; /* Make the container at least the height of the viewport */
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff; /* Container background remains white */
+}
+
+header {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.profile-image {
+    margin-right: 20px;
+}
+
+.profile-image img {
+    width: 180px;  /* Increased width */
+    height: 180px; /* Increased height */
+    object-fit: cover; /* Maintain aspect ratio */
+    border-radius: 0; /* Removed circular border */
+}
+
+.header-text {
+    text-align: left; /* Ensure header text is left-aligned */
+    margin-left: 20px; /* Added margin to move text to the right */
+}
+
+h1 {
+    margin: 0;
+    color: #2c3e50; /* Original dark blue color for main heading */
+    text-align: left; /* Left-align main heading */
+    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+}
+
+h2 {
+    color: #333333; /* Original dark gray color for subheadings */
+    margin-bottom: 10px; /* Space below the heading */
+    text-align: left; /* Left-align subheadings */
+    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+}
+
+h3 {
+    font-weight: 300; /* Use lighter weight for h3 */
+}
+
+/* Apply lighter font weight to paragraphs */
+p {
+    font-weight: 300; /* Use lighter weight for paragraphs */
+}
+
+nav {
+    display: flex;
+    justify-content: center; /* Center the navigation links */
+    margin-bottom: 20px; /* Add some space below the navigation */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    text-decoration: none; /* Remove underline from links */
+    color: #3498db; /* Link color */
+    font-weight: 300; /* Use lighter weight for navigation links */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+    color: #2c3e50; /* Darker color on hover for a stylish effect */
+}
+
+main {
+    flex: 1; /* Allow the main content to expand and take available space */
+    padding: 20px 0;
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+ul {
+    list-style-type: none; /* Remove bullets from the list */
+    padding-left: 0; /* Remove left padding */
+}
+
+ul li {
+    margin-bottom: 15px; /* Space between list items */
+}
+
+p, ul {
+    text-align: left; /* Left-align paragraphs and lists */
+    margin: 0; /* Remove any margin */
+    max-width: 600px; /* Optional: limit the width of the content */
+}
+
+footer {
+    text-align: center; /* Center the footer text */
+    padding: 10px 0;
+    font-size: 0.9em;
+    color: #777;
+    margin-top: auto; /* Push the footer to the bottom of the container */
+}
+
+/* Styles for blog post headings */
+h3 a {
+    color: #007BFF; /* Nice blue color for blog post titles */
+    text-decoration: none; /* Remove underline from links */
+}
+
+a {
+    text-decoration: none;
+}
+
+article h3 a:visited {
+    color: #007BFF; /* Keep the same color when visited */
+}
+
+article h3 a:hover {
+    color: #0056b3; /* Darker blue on hover for a stylish effect */
+}
+
+.social-links {
+    display: flex;
+    gap: 15px; /* Space between icons */
+    margin-left: auto; /* Push social links to the right */
+    margin-right: 20px; /* Add extra space to the right */
+}
+
+.social-links a {
+    color: #3498db; /* Icon color */
+    font-size: 1.5em; /* Icon size */
+    text-decoration: none; /* Remove underline */
+}
+
+.social-links a:hover {
+    color: #2c3e50; /* Darker color on hover */
+}

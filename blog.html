@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NNLIBC: Neural Networks in C for WebAssembly</title>
+    <link rel="stylesheet" href="blog.css"> <!-- Link to the blog styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>NNLIBC: Neural Networks in C for WebAssembly</h1>
+            <nav>
+                <ul>
+                    <li style="margin-left: auto;"><a href="index.html">Home</a></li>
+                    <!-- Home link moved to the right -->
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="blog-posts">
+                <article>
+                    <!-- <h2><a href="#">Blog Post Title 1</a></h2> -->
+                    <!-- <h2></h2> -->
+                    <p><em>June 1, 2022</em></p>
+                    <br>
+
+                    <h2 id="overview">Overview</h2>
+                    <p>This is a Pytorch-like neural network library written in C. Across the library, vectors are
+                        treated as 1 x n matrices.
+                        A wrapper over the <a href="https://www.gnu.org/software/gsl/">GSL library</a> is written in
+                        matrix.c with invoking syntax similar to <a href="https://numpy.org/">Numpy</a>.
+                        Sample examples are available in models directory. </p>
+                    <p><em>nnlibc</em> can be compiled to WebAssembly and run on the <a
+                            href="https://github.com/SilverLineFramework/runtime-linux">SilverLineFramework Linux
+                            Runtime</a> or the <a href="https://wasmer.io/">Wasmer</a> runtime.</p>
+                    <h2 id="gnu-scientific-library-wrapper">GNU Scientific Library Wrapper</h2>
+                    <p><a href="https://www.gnu.org/software/gsl/">The GNU Scientific Library</a> is used for matrix and
+                        vector operations and a matrix.c wrapper can be invoked to perform those operations.</p>
+                    <h4 id="compiling-gsl-to-c">Compiling GSL to C</h4>
+                    <p>Please follow the steps given <a
+                            href="https://coral.ise.lehigh.edu/jild13/2016/07/11/hello/">HERE</a>.</p>
+                    <h4 id="compiling-gsl-to-wasm">Compiling GSL to WASM</h4>
+                    <p>Install <a href="https://emscripten.org/docs/getting_started/downloads.html">Emscripten</a>.</p>
+                    <p>Download the &#39;Current Stable Version&#39; from the <a
+                            href="https://www.gnu.org/software/gsl/">GSL webpage</a>.</p>
+                    <p>In the downloaded GSL folder, say gsl-2.7.1, run the following commands</p>
+                    <pre><code>emconfigure ./configure
+emmake <span class="hljs-keyword">make</span> LDFLAGS=-<span class="hljs-keyword">all</span>-static
+sudo <span class="hljs-keyword">make</span> install
+</code></pre>
+                    <p>GSL will be installed at /opt/gsl-2.7.1 with WASM executables.</p>
+                    <h3 id="compiling-the-neural-network-library-in-c">Compiling the Neural Network Library in C</h3>
+                    <p>
+                    <pre><code>gcc -Wall *.c -lm -lgsl -lgslcblas -o Output</code></pre>
+                    </p>
+                    <h3 id="compiling-the-neural-network-library-to-wasm">Compiling the Neural Network Library to WASM
+                    </h3>
+                    <p><code>emcc *.c -o Output.wasm -I/opt/gsl-2.7.1/include -L/opt/gsl-2.7.1/lib -lgsl -lm -lgslcblas -lc -s STANDALONE_WASM</code>
+                    </p>
+                    <h3 id="running-wasm-files">Running WASM files</h3>
+                    <ul>
+                        <li>
+                            <h4 id="using-wasmer">Using Wasmer</h4>
+                            <p> Install <a href="https://github.com/wasmerio/wasmer">Wasmer</a> using the following
+                                command.</p>
+                        </li>
+                    </ul>
+                    <pre><code>curl https:<span class="hljs-comment">//get.wasmer.io -sSfL | sh</span></code></pre>
+
+                    <p>Run Wasm output file</p>
+                    <pre><code>wasmer Output.wasm</code></pre>
+                    <ul>
+                        <li>
+                            <h4 id="using-silverline-linux-runtime">Using SilverLine Linux Runtime</h4>
+                        </li>
+                        <a target="_blank"
+                            href="https://github.com/SilverLineFramework/silverline/wiki/Local-Testing-Guide">Follow the
+                            Setup steps</a>
+                    </ul>
+                    <p>Running the Wasm output file</p>
+                    <p>Open 4 terminal windows.</p>
+                    <p>Terminal <span class="hljs-number">0</span>: MQTT</p>
+                    <pre><code>mosquitto</code></pre>
+                    <p>Terminal <span class="hljs-number">1</span>: Orchestrator</p>
+                    <pre><code>cd orchestrator/arts-main
+make run
+cd orchestrator/arts-main
+make run
+</code></pre>
+                    <p>Terminal <span class="hljs-number">2</span>: Linux Runtime</p>
+                    In this example, <span class="hljs-string">'dir'</span> is at <span
+                        class="hljs-string">'/home/ritzdevp/nnlibc'</span>; replace it <span
+                        class="hljs-keyword">with</span> the path <span class="hljs-keyword">of</span> the neural
+                    network library.
+                    <pre><code>./runtime-linux/runtime --host=localhost:<span class="hljs-number">1883</span> --name=test --dir=/home/ritzdevp/nnlibc \
+     --appdir=/home/ritzdevp/nnlibc</code></pre>
+
+                    <p>Terminal <span class="hljs-number">3</span>: Run</p>
+                    <pre><code>python3 libsilverline/run.py --path Output.wasm --runtime test</code></pre>
+
+                    The output will be visible <span class="hljs-keyword">in</span> Terminal <span
+                        class="hljs-number">2.</span>
+                    </code></pre>
+                    <br>
+                    <h2 id="using-the-neural-network-library">Using the Neural Network Library</h2>
+                    <h3 id="setting-up-gsl-random-number-generator">Setting up GSL Random Number Generator</h3>
+                    <p>Referece: <a
+                            href="http://gnu.ist.utl.pt/software/gsl/manual/html_node/Random-Number-Distribution-Examples.html">Random
+                            Number Distribtion</a></p>
+                    <pre><code>const gsl_rng_type * T<span class="hljs-comment">;</span>
+gsl_rng * rng<span class="hljs-comment">;</span>
+gsl_rng_env_setup()<span class="hljs-comment">;</span>
+<span class="hljs-attribute">T</span> = gsl_rng_default<span class="hljs-comment">;</span>
+<span class="hljs-attribute">rng</span> = gsl_rng_alloc(T)<span class="hljs-comment">;</span>
+</code></pre>
+                    <h3 id="loading-data">Loading Data</h3>
+                    <p>This library reads the training and testing data from .dat files. The np2dat.py file can be used
+                        to convert a numpy file to a .dat file which can be read into a gsl_matrix* by calling the
+                        load_data() function.
+                        Here is an example,
+                        Consider that you have a numpy file in data/mnist_mini/x_train.npy.
+                        Convert this numpy file to .dat using the following command</p>
+                    <pre><code><span class="hljs-title">python3</span> np2dat.py <span class="hljs-class"><span class="hljs-keyword">data</span>/mnist_mini/x_train.npy</span>
+</code></pre>
+                    <p>The file data/mnist_mini/x_train.dat should be visible now.
+                        The data can be loaded into a gsl_matrix as shown below.</p>
+                    <pre><code><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-string">"data.h"</span></span>
+<span class="hljs-built_in">int</span> main(){
+<span class="hljs-built_in">int</span> train_len = <span class="hljs-number">2000</span><span class="hljs-comment">;</span>
+    //Note: <span class="hljs-number">28</span>x28 image is already flattened <span class="hljs-keyword">to</span> <span class="hljs-number">784</span> <span class="hljs-keyword">in</span> the data
+    gsl_matrix* x_train = load_data(<span class="hljs-string">"data/mnist_mini/x_train.dat"</span>, train_len, <span class="hljs-number">784</span>)<span class="hljs-comment">;</span>
+    x_print_shape(x_train)<span class="hljs-comment">;</span>
+    <span class="hljs-keyword">return</span>  <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+}
+</code></pre>
+                    <p>The output will be </p>
+                    <pre><code><span class="hljs-attr">shape</span> = (<span class="hljs-number">2000</span>, <span class="hljs-number">784</span>)
+</code></pre>
+                    <h3 id="creating-the-network">Creating the network</h3>
+                    <p>MLP with 2 hidden layers and one output layer, hence 3 total layers.
+                        The first hidden layer has 784 inputs that are connected to 512 neurons.
+                        The layer index for this layer is 0. Then, sigmoid activation is applied at layer index 1.
+                        Similarly, for the second
+                        hidden layer.</p>
+                    <pre><code>Xnet* mynet = Xnet_init(<span class="hljs-number">3</span>)<span class="hljs-comment">;</span>
+
+//Hidden Layer <span class="hljs-number">1</span>
+Linear* lin_layer1 = linear_init(<span class="hljs-number">784</span>,<span class="hljs-number">512</span>,<span class="hljs-number">0</span>, rng)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, lin_layer1)<span class="hljs-comment">;</span>
+Activation* act1 = Act_init(<span class="hljs-string">"sigmoid"</span>, <span class="hljs-number">1</span>)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, act1)<span class="hljs-comment">;</span>
+
+//Hidden Layer <span class="hljs-number">2</span>
+Linear* lin_layer2 = linear_init(<span class="hljs-number">512</span>,<span class="hljs-number">512</span>,<span class="hljs-number">2</span>, rng)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, lin_layer2)<span class="hljs-comment">;</span>
+Activation* act2 = Act_init(<span class="hljs-string">"sigmoid"</span>, <span class="hljs-number">3</span>)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, act2)<span class="hljs-comment">;</span>
+
+//Output Layer
+Linear* lin_layer3 = linear_init(<span class="hljs-number">512</span>,<span class="hljs-number">10</span>,<span class="hljs-number">4</span>, rng)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, lin_layer3)<span class="hljs-comment">;</span>
+Activation* act3 = Act_init(<span class="hljs-string">"identity"</span>, <span class="hljs-number">5</span>)<span class="hljs-comment">;</span>
+xnet_add(<span class="hljs-name">mynet</span>, act3)<span class="hljs-comment">;</span>
+</code></pre>
+                    <h3 id="training">Training</h3>
+                    <p>The loop runs for 3 epochs, over 1000 data points. Gradients are zeroed out for the new
+                        iteration. The output is generated by a forward pass in the network
+                        followed by a backward pass. The weights are updated in each iteration.</p>
+                    <pre><code>int num_epochs = <span class="hljs-number">3</span><span class="hljs-comment">;</span>
+for (<span class="hljs-name">int</span> epoch = <span class="hljs-number">0</span><span class="hljs-comment">; epoch &lt; num_epochs; epoch++){</span>
+    for (<span class="hljs-name">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 1000; i++){</span>
+        net_zero_grad(<span class="hljs-name">mynet</span>)<span class="hljs-comment">;</span>
+        gsl_matrix* input = get_row(<span class="hljs-name">x_train</span>, i)<span class="hljs-comment">;</span>
+        gsl_matrix* output = net_forward(<span class="hljs-name">input</span>, mynet)<span class="hljs-comment">;</span>
+        gsl_matrix* desired = get_row(<span class="hljs-name">y_train</span>, i)<span class="hljs-comment">;</span>
+        net_backward(<span class="hljs-name">desired</span>, mynet)<span class="hljs-comment">;</span>
+        net_step(<span class="hljs-name">mynet</span>, <span class="hljs-number">0.01</span>)<span class="hljs-comment">; //lr=0.01</span>
+    }
+    printf(<span class="hljs-string">"Epoch %d done.\n"</span>, epoch)<span class="hljs-comment">;</span>
+}
+</code></pre>
+                    <h1 id="model-examples">Model Examples</h1>
+                    <ul>
+                        <li>
+                            <h3 id="xor-experiment">XOR Experiment</h3>
+                            <p> <img src="https://github.com/ritzdevp/nnlibc/blob/main/model_examples/nn.png?raw=true"
+                                    alt="alt text" width="70%">
+                                <br>
+                                Copy the contents in models/xor.c and paste in playground.c
+                                Compile and run
+                                The output should be
+                            </p>
+                            <pre><code>  XOR MLP
+  Epoch <span class="hljs-number">0</span> Loss <span class="hljs-number">0.696</span>.
+  Epoch <span class="hljs-number">100</span> Loss <span class="hljs-number">0.527</span>.
+  Epoch <span class="hljs-number">200</span> Loss <span class="hljs-number">0.352</span>.
+  Epoch <span class="hljs-number">300</span> Loss <span class="hljs-number">0.334</span>.
+  Epoch <span class="hljs-number">400</span> Loss <span class="hljs-number">0.327</span>.
+
+  <span class="hljs-number">0.000000</span> <span class="hljs-number">0.000000</span> 
+  Out = <span class="hljs-number">0</span>
+
+  <span class="hljs-number">0.000000</span> <span class="hljs-number">1.000000</span> 
+  Out = <span class="hljs-number">1</span>
+
+  <span class="hljs-number">1.000000</span> <span class="hljs-number">0.000000</span> 
+  Out = <span class="hljs-number">1</span>
+
+  <span class="hljs-number">1.000000</span> <span class="hljs-number">1.000000</span> 
+  Out = <span class="hljs-number">0</span>
+</code></pre>
+                        </li>
+                        <li>
+                            <h3 id="mnist-experiment">MNIST Experiment</h3>
+                            <p> Copy the contents in models/mnist.c and paste in playground.c
+                                Compile and run.
+                                The output should be</p>
+                            <pre><code>  shape = (<span class="hljs-number">2000</span>, <span class="hljs-number">784</span>)
+  shape = (<span class="hljs-number">2000</span>, <span class="hljs-number">10</span>)
+  shape = (<span class="hljs-number">100</span>, <span class="hljs-number">784</span>)
+  shape = (<span class="hljs-number">100</span>, <span class="hljs-number">10</span>)
+  Designing the model
+  Epoch <span class="hljs-number">0</span> done.
+  Epoch <span class="hljs-number">1</span> done.
+  Epoch <span class="hljs-number">2</span> done.
+  Accuracy Percentage = <span class="hljs-number">65.000</span>
+</code></pre>
+                        </li>
+                    </ul>
+
+
+
+                </article>
+            </section>
+        </main>
+
+        <footer>
+            <p>prompt engineering for building static sites is awesome!</p>
+        </footer>
+    </div>
+</body>
+
+</html>

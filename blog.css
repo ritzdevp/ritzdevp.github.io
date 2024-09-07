@@ -1,0 +1,116 @@
+/* General styles for the blog */
+
+html, body {
+    height: 100%; /* Make sure the body takes the full height */
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Use Roboto font */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff; /* White background */
+    color: #333; /* Default text color */
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    min-height: 100vh; /* Make the container at least the height of the viewport */
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff; /* Container background remains white */
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between title and navigation */
+    padding: 20px 0;
+}
+
+h1 {
+    margin: 0;
+    color: #2c3e50; /* Dark blue color for blog title */
+    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end; /* Align navigation to the right */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+}
+
+/* Apply lighter font weight to paragraphs */
+p {
+    font-weight: 300; /* Use lighter weight for paragraphs */
+}
+
+nav ul li {
+    margin: 0 20px; /* Space between links */
+}
+
+nav ul li a {
+    text-decoration: none; /* Remove underline from links */
+    color: #3498db; /* Link color */
+    font-weight: 300; /* Use lighter weight for navigation links */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+    color: #2c3e50; /* Darker color on hover for a stylish effect */
+}
+
+main {
+    flex: 1; /* Allow the main content to expand and take available space */
+    padding: 20px 0;
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+article {
+    margin-bottom: 20px; /* Space between blog posts */
+}
+
+article h2 {
+    margin: 0; /* Remove margin for the blog post title */
+    color: #007BFF; /* Nice blue color for blog post titles */
+    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+}
+
+article p {
+    margin: 5px 0; /* Space between paragraphs */
+}
+
+article a {
+    text-decoration: none; /* Remove underline from links */
+    color: #3498db; /* Link color */
+    font-weight: 300; /* Use lighter weight for links */
+}
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.9em;
+    color: #777;
+}
+
+pre {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+}
+code {
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 14px;
+}
