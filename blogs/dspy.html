@@ -39,7 +39,7 @@ Can this be improved in any way?
 Yes, DSPy (dee-ess pie)  is a tool that attempts to give “structure” to your prompt engineering pipelines.
 The objective of DSPy is to create a paradigm shift, quoting from the documentation; “Programming-not prompting Language Models”.</p>
 <p>But what does DSPy stand for? Declarative Self-improving Language Programs, <em>pythonically</em>. <a href="https://github.com/stanfordnlp/dspy?tab=readme-ov-file#mini-faqs">See this FAQ!</a></p>
-<p>Here is an interesting use case of how <a href="https://gradient.ai/blog/achieving-gpt-4-level-performance-at-lower-cost-using-dspy">Gradient AI used DSPy</a> to cut costs while maintaining GPT 4 level performance.</p>
+<p>Here is an interesting use case of how <a target="_blank" href="https://gradient.ai/blog/achieving-gpt-4-level-performance-at-lower-cost-using-dspy">Gradient AI used DSPy</a> to cut costs while maintaining GPT 4 level performance.</p>
 <h3 id="some-technical-terminology">Some Technical Terminology</h3>
 <p>DSPy introduces the following</p>
 <ul>
@@ -50,7 +50,7 @@ The objective of DSPy is to create a paradigm shift, quoting from the documentat
 <p>How to approach DSPy?
 We can break it down into these <a href="https://dspy-docs.vercel.app/docs/building-blocks/solving_your_task">8 steps</a>. </p>
 <p>To summarize, given a task where you know your input and output format, you can provide 10-50 examples to DSPy, pick an optimization technique, define a metric and let it generate a prompt that achieves the best performance on that metric.</p>
-<p>In addition to remote LLM API endpoints which are publicly available (OpenAI, Cohere, Anyscale and more), DSPy allows you to connect to your locally hosted LLMs as well, <a href="https://dspy-docs.vercel.app/docs/deep-dive/language_model_clients/custom-lm-client">see here.</a></p>
+<p>In addition to remote LLM API endpoints which are publicly available (OpenAI, Cohere, Anyscale and more), DSPy allows you to connect to your locally hosted LLMs as well, <a target="_blank" href="https://dspy-docs.vercel.app/docs/deep-dive/language_model_clients/custom-lm-client">see here.</a></p>
 <h2 id="toy-example">Toy Example</h2>
 <p>While trying out DSPy, I played with a fairly simple toy problem, to understand what’s happening under the hood.</p>
 <p>Given a sentence, the task of the DSPy module is to convert it to upper case and end the sentence with an exclamation.
@@ -141,7 +141,7 @@ Follow the following format.
 <span class="hljs-attr">Sentence:</span> This is a test example
 <span class="hljs-attr">Ans:</span>
 </code></pre><p>The first line of the prompt is picked by the docstring of the user-defined signature.
-The line “Follow the following format.” comes from the <a href="​​https://github.com/stanfordnlp/dspy/blob/31c11dafdd965ce46313a8036832228564944ed2/dsp/adapters/template.py#L60">source code of the DSPy adapter here.</a>
+The line “Follow the following format.” comes from the <a target="_blank" href="https://github.com/stanfordnlp/dspy/blob/main/dsp/adapters/template.py">source code of the DSPy adapter here.</a>
 Followed by randomly chosen “demos” from the training set, and finally the input sentence is appended “This is a test example”.</p>
 <p>Depending upon the complexity of the task, optimization technique, compilation configuration and training data size, DSPy can call the LLM endpoint thousands of times.</p>
 <p>Typically, the “compiled program” is stored as a json
