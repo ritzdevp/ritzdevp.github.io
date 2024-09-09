@@ -92,7 +92,7 @@ dspy<span class="hljs-selector-class">.settings</span><span class="hljs-selector
    <span class="hljs-keyword">return</span> dspy.Prediction(ans=output.ans)
 </code></pre><p>Define your validation function</p>
 <pre><code><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">validate</span><span class="hljs-params">(<span class="hljs-symbol">input:</span> dspy.Example, <span class="hljs-symbol">output:</span> dspy.Prediction, trace=None)</span></span>:
- <span class="hljs-keyword">return</span> otput.ans == input.ans.upper() + <span class="hljs-string">"!"</span>
+ <span class="hljs-keyword">return</span> output.ans == input.ans.upper() + <span class="hljs-string">"!"</span>
 </code></pre><p>“Compile” your DSPy module!</p>
 <pre><code>from dspy.teleprompt <span class="hljs-built_in">import</span> BootstrapFewShotWithRandomSearch
 <span class="hljs-attr">config</span> = dict(
