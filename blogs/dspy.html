@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick thoughts on DSPy: automatic prompt optimization?</title>
+    <link rel="stylesheet" href="blog.css"> <!-- Link to the blog styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Quick thoughts on DSPy: automatic prompt optimization?</h1>
+            <nav>
+                <ul>
+                    <li style="margin-left: auto;"><a href="index.html">Home</a></li>
+                    <!-- Home link moved to the right -->
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="blog-posts">
+                <article>
+                    <!-- <h2><a href="#">Blog Post Title 1</a></h2> -->
+                    <!-- <h2></h2> -->
+                    <p><em>Sep 8, 2024</em></p>
+                    <br>
+                    <h2 id="quick-thoughts-on-dspy-automatic-prompt-optimization-">Overview</h2>
+<p><a href="https://dspy-docs.vercel.app/">https://dspy-docs.vercel.app/</a></p>
+<p><a href="https://github.com/stanfordnlp/dspy">https://github.com/stanfordnlp/dspy</a></p>
+<p>Let’s cut to the chase. 
+You want to build a pipeline where you give an input to your system, call a few APIs for your business logic, call an LLM to use the results of those APIs and then generate an output in a fixed format. 
+You could write a few Python scripts to achieve this, deploy it and voila. </p>
+<p>Another team or org wants to implement a new pipeline. They repeat the same process.
+Can this be improved in any way?
+Yes, DSPy (dee-ess pie)  is a tool that attempts to give “structure” to your prompt engineering pipelines.
+The objective of DSPy is to create a paradigm shift, quoting from the documentation; “Programming-not prompting Language Models”.</p>
+<p>But what does DSPy stand for? Declarative Self-improving Language Programs, <em>pythonically</em>. <a href="https://github.com/stanfordnlp/dspy?tab=readme-ov-file#mini-faqs">See this FAQ!</a></p>
+<p>Here is an interesting use case of how <a href="https://gradient.ai/blog/achieving-gpt-4-level-performance-at-lower-cost-using-dspy">Gradient AI used DSPy</a> to cut costs while maintaining GPT 4 level performance.</p>
+<h3 id="some-technical-terminology">Some Technical Terminology</h3>
+<p>DSPy introduces the following</p>
+<ul>
+<li>Signatures - to abstract prompts</li>
+<li>Modules - to abstract prompting techniques</li>
+<li>Optimizers - that can tune the prompts (or weights of the LLM) of modules</li>
+</ul>
+<p>How to approach DSPy?
+We can break it down into these <a href="https://dspy-docs.vercel.app/docs/building-blocks/solving_your_task">8 steps</a>. </p>
+<p>To summarize, given a task where you know your input and output format, you can provide 10-50 examples to DSPy, pick an optimization technique, define a metric and let it generate a prompt that achieves the best performance on that metric.</p>
+<p>In addition to remote LLM API endpoints which are publicly available (OpenAI, Cohere, Anyscale and more), DSPy allows you to connect to your locally hosted LLMs as well, <a href="https://dspy-docs.vercel.app/docs/deep-dive/language_model_clients/custom-lm-client">see here.</a></p>
+<h2 id="toy-example">Toy Example</h2>
+<p>While trying out DSPy, I played with a fairly simple toy problem, to understand what’s happening under the hood.</p>
+<p>Given a sentence, the task of the DSPy module is to convert it to upper case and end the sentence with an exclamation.
+For example,</p>
+<pre><code>Input: Hello this <span class="hljs-keyword">is</span> a blog <span class="hljs-keyword">on</span> DSPy
+Output: HELLO THIS <span class="hljs-keyword">IS</span> A BLOG <span class="hljs-keyword">ON</span> DSPY!
+</code></pre><p>For this experiment, I used Llama 3.1 8b Instruct.</p>
+<pre><code>llm = MyCustomRemoteLM(model=<span class="hljs-string">"llama-3.1-8b-instruct"</span>)
+dspy<span class="hljs-selector-class">.settings</span><span class="hljs-selector-class">.configure</span>(lm=llm)
+</code></pre><p>Every data point should be an object of <code>dspy.Example</code></p>
+<pre><code>data = [
+   dspy.Example(
+        sentence=<span class="hljs-string">"Hello world how are you"</span>,
+        ans=<span class="hljs-string">"HELLO WORLD HOW ARE YOU!"</span>
+    ).with_inputs(<span class="hljs-string">"sentence"</span>),
+
+   dspy.Example(
+        sentence=<span class="hljs-string">"This is a blog post"</span>,
+        ans=<span class="hljs-string">"THIS IS A BLOG POST!"</span>
+    ).with_inputs(<span class="hljs-string">"sentence"</span>),
+   .
+   .
+   .
+]
+</code></pre><p>Define a signature</p>
+<pre><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UpperYay</span><span class="hljs-params">(dspy.Signature)</span>:</span>
+ <span class="hljs-string">"""Convert the sentence to upper case and end the sentence with an exclamation mark."""</span>
+
+
+ sentence = dspy.InputField()
+ ans = dspy.OutputField(desc=<span class="hljs-string">"Only give the output of the result."</span>)
+</code></pre><p>Define your module</p>
+<pre><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyModule</span>(<span class="hljs-title">dspy</span>.<span class="hljs-title">Module</span>):</span>
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>)</span></span>:
+   <span class="hljs-keyword">super</span>().__init_<span class="hljs-number">_</span>()
+   <span class="hljs-keyword">self</span>.get_output = dspy.Predict(UpperYay)
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, sentence)</span></span>:
+   output = <span class="hljs-keyword">self</span>.get_output(sentence=sentence)
+   <span class="hljs-keyword">return</span> dspy.Prediction(ans=output.ans)
+</code></pre><p>Define your validation function</p>
+<pre><code><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">validate</span><span class="hljs-params">(<span class="hljs-symbol">input:</span> dspy.Example, <span class="hljs-symbol">output:</span> dspy.Prediction, trace=None)</span></span>:
+ <span class="hljs-keyword">return</span> otput.ans == input.ans.upper() + <span class="hljs-string">"!"</span>
+</code></pre><p>“Compile” your DSPy module!</p>
+<pre><code>from dspy.teleprompt <span class="hljs-built_in">import</span> BootstrapFewShotWithRandomSearch
+<span class="hljs-attr">config</span> = dict(
+    <span class="hljs-attr">max_bootstrapped_demos=3,</span>
+    <span class="hljs-attr">max_labeled_demos=3,</span>
+    <span class="hljs-attr">num_candidate_programs=5,</span>
+    <span class="hljs-attr">num_threads=2
+)</span>
+<span class="hljs-attr">telepormpter</span> = BootstrapFewShotWithRandomSearch(metric-validate, **config)
+<span class="hljs-attr">optimized_program</span> = telepormpter.optimize(MyModule(), <span class="hljs-attr">trainset=data)</span>
+</code></pre><p>Under the hood, using the Bootstrap optimizer, DSPy picks <code>max_labeled_demos</code> examples at random from the training set we provided, creates a prompt in a fixed format, compares the output of the LLM to the expected output and then uses the metric to determine whether the prompt was successful or not.
+It iterates this process for 5 candidate prompts across 2 threads.</p>
+<p><img src="dspy.png" alt="dspydiag" width="96%"></p>
+<br>
+<br>
+<p><a href="https://dspy-docs.vercel.app/docs/deep-dive/teleprompter/bootstrap-fewshot#using-bootstrapfewshot">What is the difference between max_labeled_demos (from the user) and max_bootstrapped_demos (generated by DSPy using a teacher model)?</a></p>
+<br>
+<br>
+<p>In every LLM call, the prompt that is sent looks like this</p>
+<pre><code>Convert the sentence to upper case and end the sentence with an exclamation mark.
+
+<span class="hljs-meta">---</span>
+
+Follow the following format.
+
+<span class="hljs-attr">Sentence:</span> ${sentence}
+<span class="hljs-attr">Ans:</span> Only give the output of the result.
+
+<span class="hljs-meta">---</span>
+
+<span class="hljs-attr">Sentence:</span> Hello world how are you
+<span class="hljs-attr">Ans:</span> HELLO WORLD HOW ARE YOU!
+
+<span class="hljs-meta">---</span>
+
+<span class="hljs-attr">Sentence:</span> This is a blog post
+<span class="hljs-attr">Ans:</span> THIS IS A BLOG POST!
+
+<span class="hljs-meta">---</span>
+
+<span class="hljs-attr">Sentence:</span> Another example for dspy
+<span class="hljs-attr">Ans:</span> ANOTHER EXAMPLE FOR DSPY!
+
+<span class="hljs-meta">---</span>
+
+<span class="hljs-attr">Sentence:</span> This is a test example
+<span class="hljs-attr">Ans:</span>
+</code></pre><p>The first line of the prompt is picked by the docstring of the user-defined signature.
+The line “Follow the following format.” comes from the <a href="​​https://github.com/stanfordnlp/dspy/blob/31c11dafdd965ce46313a8036832228564944ed2/dsp/adapters/template.py#L60">source code of the DSPy adapter here.</a>
+Followed by randomly chosen “demos” from the training set, and finally the input sentence is appended “This is a test example”.</p>
+<p>Depending upon the complexity of the task, optimization technique, compilation configuration and training data size, DSPy can call the LLM endpoint thousands of times.</p>
+<p>Typically, the “compiled program” is stored as a json
+For example</p>
+<pre><code>{
+   <span class="hljs-string">"get_output"</span>: {
+       <span class="hljs-string">"lm"</span>: ...,
+       <span class="hljs-string">"traces"</span>: [...],
+       <span class="hljs-string">"train"</span>: [...],
+       <span class="hljs-string">"demos"</span>: [
+           {
+               <span class="hljs-string">"sentence"</span>: <span class="hljs-string">"Hello world how are you"</span>,
+               <span class="hljs-string">"ans"</span>: <span class="hljs-string">"HELLO WORLD HOW ARE YOU
+           },
+           {
+               "</span>sentence<span class="hljs-string">": "</span>This <span class="hljs-keyword">is</span> a blog post<span class="hljs-string">",
+               "</span>ans<span class="hljs-string">": "</span>THIS <span class="hljs-keyword">IS</span> A BLOG POST!<span class="hljs-string">"
+           }
+           .
+           .
+           .
+       ],
+       "</span>signature_instructions<span class="hljs-string">":
+        "</span>Convert the sentence to upper <span class="hljs-keyword">case</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">end</span> the sentence <span class="hljs-keyword">with</span> an exclamation mark.<span class="hljs-string">",
+       "</span>signature_prefix<span class="hljs-string">": "</span>Ans:<span class="hljs-string">"
+   }
+}</span>
+</code></pre><p>The demos in the compiled program are the ones that are most performant on the user defined metric.</p>
+<h3 id="some-observations">Some observations</h3>
+<ul>
+<li>Given a training set of input/output data, DSPy will send batches of this set, determine which batch works best and give you the best prompt.</li>
+<li>DSPy is a pretty useful tool to give your prompt engineering pipeline a more structured paradigm. However, the performance of your modules are still dependant on the data that you provide, the optimization technique and the quality of your “Signatures”.</li>
+<li>The overall idea of “programming” LLMs is promising. However, the library is still nascent so you may run into some issues during the onboarding process.
+Check out this interesting blog post by Isaac Miller on the challenges that DSPy currently faces. <a href="https://blog.isaacbmiller.com/posts/dspy">https://blog.isaacbmiller.com/posts/dspy</a></li>
+</ul>
+
+            </section>
+        </main>
+
+        <footer>
+            <!-- <p>prompt engineering for building static sites is awesome!</p> -->
+        </footer>
+    </div>
+</body>
+
+</html>
