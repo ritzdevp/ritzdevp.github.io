@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,7 +9,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700&display=swap" rel="stylesheet">
 </head>
 
-<h1 id="evaluating-tool-calling-in-qwen3-4b-base-prompting-and-lora">Evaluating Tool Calling in Qwen3-4B: Base, Prompting and LoRA</h1>
+<body>
+    <div class="container">
+        <header>
+            <h1>Evaluating Tool Calling in Qwen3-4B: Base, Prompting and LoRA</h1>
+            <nav>
+                <ul>
+                    <li style="margin-left: auto;"><a href="../index.html">Home</a></li>
+                    <!-- Home link moved to the right -->
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="blog-posts">
+                <article>
+                    <!-- <h2><a href="#">Blog Post Title 1</a></h2> -->
+                    <!-- <h2></h2> -->
+                    <p><em>Feb 10, 2026</em></p>
+                    <br>
+                    <h2 id="evaluating-tool-calling-in-qwen3-4b-base-prompting-and-lora">Overview</h2>
+
+
+<!-- <h1 id="evaluating-tool-calling-in-qwen3-4b-base-prompting-and-lora">Evaluating Tool Calling in Qwen3-4B: Base, Prompting and LoRA</h1> -->
 <p>In this blog, we are going to look at the performance of a fine-tuned Qwen3-4B Base variant on a well defined, structured task. The motivation behind this exercise is to evaluate a small language model’s learning capability of behaviour of structure, formatting and parsing which are paramount for agentic tool calling. We also look at some hyperparameters and the hypothesis behind those decisions.</p>
 <h2 id="task">Task</h2>
 <p>For this task, we use <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">Salesforce’s xlam-function-calling-60k</a> dataset from HuggingFace.
@@ -24,13 +48,15 @@ Specifically, an example from the dataset is in the following JSON format:</p>
         num_rows: 60000
     })
 })
-</code></pre><p>Quoting an example from <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k</a></p>
+</code></pre><p>Quoting an example from the home page of <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k</a></p>
 <pre><code class="lang-json">{
-  <span class="hljs-attr">"query"</span>: <span class="hljs-string">"Find the sum of all the multiples of 3 and 5 between 1 and 1000. Also find the product of the first five prime numbers."</span>,
+  <span class="hljs-attr">"query"</span>: <span class="hljs-string">"Find the sum of all the multiples of 3 and 5 between 1 and 1000.
+    Also find the product of the first five prime numbers."</span>,
   <span class="hljs-attr">"tools"</span>: [
     {
       <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>,
-      <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Find the sum of all multiples of specified numbers within a specified range."</span>,
+      <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Find the sum of all multiples of specified numbers within a
+        specified range."</span>,
       <span class="hljs-attr">"parameters"</span>: {
         <span class="hljs-attr">"lower_limit"</span>: {
           <span class="hljs-attr">"type"</span>: <span class="hljs-string">"int"</span>,
@@ -205,7 +231,22 @@ LoRA Model - Tools Exist Accuracy: <span class="hljs-number">100</span>.<span cl
 </code></pre><p>As we can see, the base model was able to generate a valid JSON for 63 % of the cases. And based on the numbers, it appears that it was able to parse the correct tools. However, none of the base model outputs led to an exact JSON match with the expected output.</p>
 <p>On the other hand, the LoRA tuned version accurately learnt the JSON structure and in over 80% of the cases, there was an exact match with the expected output. There was no hallucination by the LoRA model which means for each example, it always picked the tools and args specified in the query.</p>
 <p>Let us take a look at the generated output for the prompt we used earlier, using the LoRA tuned model.</p>
-<pre><code class="lang-json">[{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>, <span class="hljs-attr">"arguments"</span>: {<span class="hljs-attr">"lower_limit"</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">"upper_limit"</span>: <span class="hljs-number">1000</span>, <span class="hljs-attr">"multiples"</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>]}}, {<span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>, <span class="hljs-attr">"arguments"</span>: {<span class="hljs-attr">"count"</span>: <span class="hljs-number">5</span>}}]
+<pre><code class="lang-json">[
+  {
+    <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>,
+    <span class="hljs-attr">"arguments"</span>: {
+      <span class="hljs-attr">"lower_limit"</span>: <span class="hljs-number">1</span>,
+      <span class="hljs-attr">"upper_limit"</span>: <span class="hljs-number">1000</span>,
+      <span class="hljs-attr">"multiples"</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>]
+    }
+  },
+  {
+    <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>,
+    <span class="hljs-attr">"arguments"</span>: {
+      <span class="hljs-attr">"count"</span>: <span class="hljs-number">5</span>
+    }
+  }
+]
 </code></pre>
 <h4 id="it-is-an-exact-match-">It is an exact match.</h4>
 <h2 id="conclusion">Conclusion</h2>
@@ -226,3 +267,6 @@ but even within this limited setup, the impact of LoRA on structured generation 
 <li><a href="https://arxiv.org/abs/2305.14314">QLoRA: Efficient Finetuning of Quantized LLMs</a></li>
 <li><a href="https://arxiv.org/abs/2505.09388">Qwen3 Technical Report</a></li>
 </ul>
+
+</body>
+</html>
