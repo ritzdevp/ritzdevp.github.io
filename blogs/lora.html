@@ -1,0 +1,228 @@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluating Tool Calling in Qwen3-4B: Base, Prompting and LoRA</title>
+    <link rel="stylesheet" href="blog.css"> <!-- Link to the blog styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<h1 id="evaluating-tool-calling-in-qwen3-4b-base-prompting-and-lora">Evaluating Tool Calling in Qwen3-4B: Base, Prompting and LoRA</h1>
+<p>In this blog, we are going to look at the performance of a fine-tuned Qwen3-4B Base variant on a well defined, structured task. The motivation behind this exercise is to evaluate a small language model’s learning capability of behaviour of structure, formatting and parsing which are paramount for agentic tool calling. We also look at some hyperparameters and the hypothesis behind those decisions.</p>
+<h2 id="task">Task</h2>
+<p>For this task, we use <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">Salesforce’s xlam-function-calling-60k</a> dataset from HuggingFace.
+The dataset maps natural language queries to precise function calls needed to fetch the user’s requested data.
+Specifically, an example from the dataset is in the following JSON format:</p>
+<ul>
+<li><code>query</code> - The question or query by a user</li>
+<li><code>tools</code> - The list of available tools that can be used by an agent to fetch relevant data. This includes the tool’s name, description and expected parameters.</li>
+<li><code>answers</code> - An array of tool calls with parameters obtained from the user’s query. This is the target label for this task and we expect our model to generate this information in a structured JSON object.</li>
+</ul>
+<pre><code><span class="hljs-selector-tag">DatasetDict</span>({
+    <span class="hljs-attribute">train</span>: <span class="hljs-built_in">Dataset</span>({
+        features: [<span class="hljs-string">'id'</span>, <span class="hljs-string">'query'</span>, <span class="hljs-string">'answers'</span>, <span class="hljs-string">'tools'</span>],
+        num_rows: 60000
+    })
+})
+</code></pre><p>Quoting an example from <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k</a></p>
+<pre><code class="lang-json">{
+  <span class="hljs-attr">"query"</span>: <span class="hljs-string">"Find the sum of all the multiples of 3 and 5 between 1 and 1000. Also find the product of the first five prime numbers."</span>,
+  <span class="hljs-attr">"tools"</span>: [
+    {
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>,
+      <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Find the sum of all multiples of specified numbers within a specified range."</span>,
+      <span class="hljs-attr">"parameters"</span>: {
+        <span class="hljs-attr">"lower_limit"</span>: {
+          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"int"</span>,
+          <span class="hljs-attr">"description"</span>: <span class="hljs-string">"The start of the range (inclusive)."</span>,
+          <span class="hljs-attr">"required"</span>: <span class="hljs-literal">true</span>
+        },
+        <span class="hljs-attr">"upper_limit"</span>: {
+          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"int"</span>,
+          <span class="hljs-attr">"description"</span>: <span class="hljs-string">"The end of the range (inclusive)."</span>,
+          <span class="hljs-attr">"required"</span>: <span class="hljs-literal">true</span>
+        },
+        <span class="hljs-attr">"multiples"</span>: {
+          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"list"</span>,
+          <span class="hljs-attr">"description"</span>: <span class="hljs-string">"The numbers to find multiples of."</span>,
+          <span class="hljs-attr">"required"</span>: <span class="hljs-literal">true</span>
+        }
+      }
+    },
+    {
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>,
+      <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Find the product of the first n prime numbers."</span>,
+      <span class="hljs-attr">"parameters"</span>: {
+        <span class="hljs-attr">"count"</span>: {
+          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"int"</span>,
+          <span class="hljs-attr">"description"</span>: <span class="hljs-string">"The number of prime numbers to multiply together."</span>,
+          <span class="hljs-attr">"required"</span>: <span class="hljs-literal">true</span>
+        }
+      }
+    }
+  ],
+  <span class="hljs-attr">"answers"</span>: [
+    {
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>,
+      <span class="hljs-attr">"arguments"</span>: {
+        <span class="hljs-attr">"lower_limit"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"upper_limit"</span>: <span class="hljs-number">1000</span>,
+        <span class="hljs-attr">"multiples"</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>]
+      }
+    },
+    {
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>,
+      <span class="hljs-attr">"arguments"</span>: {
+        <span class="hljs-attr">"count"</span>: <span class="hljs-number">5</span>
+      }
+    }
+  ]
+}
+</code></pre>
+<p>Looking at the dataset example itself, we can see that the expected response from our model must follow a strict JSON structure, which is why we will set a few hyperparameters such that there is minimal “creativity” during generation.</p>
+<p>There are 60k examples in the dataset. Across the entire dataset, there are about 3600 unique tools, with a few tools that appear fairly frequently in many examples.
+It is interesting to note that the average number of tool calls for every query is about ~2, while the maximum number of calls for a query is ~50.</p>
+<p>For the experiments in this article, 5 percent of the data was used for evaluation, and the rest for training. However, we will see that only a small fraction of the training data was needed for the model to learn the desired formatting and parsing.</p>
+<p>From the training set, this is the approximate distribution of the input sequence length</p>
+<p><img width="620" height="333" alt="image" src="https://github.com/user-attachments/assets/4109518d-11de-47c8-8dc4-006f6425c62b" /></p>
+<p>With the sequence length ranging between 100 to 3000, and average sequence length being ~400.</p>
+<p>The dataset itself was generated by DeepSeek-V2-Chat and Mixtral-8x22B-Inst.
+You can find more details about this dataset in the <a href="https://arxiv.org/pdf/2409.03215">XLAM paper</a>.</p>
+<h2 id="qwen3-xb-base-or-instruct-">Qwen3-xB? Base or Instruct?</h2>
+<p>For this exercise, we will go ahead with one of the Qwen3 models. It’s open source, and a highly performant model across various tasks. You can read more about Qwen3’s capabilities in this <a href="https://arxiv.org/abs/2505.09388">paper</a>. As I have access to an A100 GPU, I chose the 4B variant. </p>
+<p>But the question is, do we want the Base or the Instruct variant? Well, the task at hand can quite likely be solved by Qwen3-4B-Instruct with some curated prompt tuning. However, in this exercise, the goal is to parse the correct arguments from natural language and generate an accurate JSON conforming object. There is less motivation for instruction-following.  In addition,  we want to evaluate the pretrained-base version’s behaviour after fine-tuning with LoRA.</p>
+<p><a href="https://huggingface.co/Qwen/Qwen3-4B-Base">https://huggingface.co/Qwen/Qwen3-4B-Base</a></p>
+<h2 id="before-lora">Before LoRA</h2>
+<p>Let’s see the Base model’s behaviour on a query. For this, we will run the example available on <a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k</a> </p>
+<p>For inference, we will set the following parameters</p>
+<ul>
+<li>max_new_tokens=200</li>
+<li>do_sample=False</li>
+<li>temperature=None</li>
+<li>top_p=None</li>
+</ul>
+<p>But why?
+Well, for function calling tasks, we want a model that generates precise and deterministic outputs. The emphasis is less “creativity” and more on accuracy of structure. Hence, we will opt for a deterministic, greedy approach.</p>
+<p>So let’s see the output on running inference on this raw example.</p>
+<pre><code>This JSON object <span class="hljs-keyword">contains</span> <span class="hljs-keyword">a</span> query <span class="hljs-keyword">and</span> <span class="hljs-literal">two</span> tools that can be used <span class="hljs-built_in">to</span> solve <span class="hljs-keyword">the</span> problem.
+The <span class="hljs-keyword">first</span> tool, <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>, can be used <span class="hljs-built_in">to</span> find <span class="hljs-keyword">the</span> <span class="hljs-built_in">sum</span> <span class="hljs-keyword">of</span> all multiples
+<span class="hljs-keyword">of</span> <span class="hljs-number">3</span> <span class="hljs-keyword">and</span> <span class="hljs-number">5</span> between <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> <span class="hljs-number">1000.</span> The <span class="hljs-keyword">second</span> tool, <span class="hljs-string">"math_toolkit.product_of_primes"</span>,
+can be used <span class="hljs-built_in">to</span> find <span class="hljs-keyword">the</span> product <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">first</span> <span class="hljs-literal">five</span> prime numbers.
+The answers section <span class="hljs-keyword">contains</span> <span class="hljs-keyword">the</span> arguments that need <span class="hljs-built_in">to</span> be passed <span class="hljs-built_in">to</span> <span class="hljs-keyword">each</span> tool
+<span class="hljs-built_in">to</span> solve <span class="hljs-keyword">the</span> problem.
+</code></pre><p>Well, this is not a JSON object. However, the base model itself is quite powerful semantically. It would be interesting to see the output if we format the prompt and introduce a small system instruction.</p>
+<p>Let’s introduce a format for each prompt. Each prompt will be as follows</p>
+<pre><code class="lang-html">&lt;system_prompt&gt;
+Only use <span class="hljs-keyword">the</span> tools provided <span class="hljs-keyword">and</span> <span class="hljs-built_in">get</span> <span class="hljs-keyword">the</span> args <span class="hljs-built_in">from</span> <span class="hljs-keyword">the</span> query.
+And only output <span class="hljs-keyword">a</span> valid json which shows <span class="hljs-keyword">the</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">call</span> <span class="hljs-title">and</span> <span class="hljs-title">the</span> <span class="hljs-title">args</span>.</span>
+&lt;/system_prompt&gt;
+&lt;query&gt;
+…
+&lt;/query&gt;
+&lt;answer&gt;
+</code></pre>
+<p>As you can see, we did not apply a closing tag for <code>&lt;answer&gt;</code>. The reason is that for the final output, we only need a JSON object.</p>
+<p>Let’s evaluate the output of the base model on a <strong>formatted</strong> input prompt. The result?</p>
+<pre><code class="lang-json">{
+  <span class="hljs-string">"function"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>,
+  <span class="hljs-string">"args"</span>: {
+    <span class="hljs-string">"lower_limit"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">"upper_limit"</span>: <span class="hljs-number">1000</span>,
+    <span class="hljs-string">"multiples"</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>]
+  }
+},
+{
+  <span class="hljs-string">"function"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>,
+  <span class="hljs-string">"args"</span>: {
+    <span class="hljs-string">"count"</span>: <span class="hljs-number">5</span>
+  }
+}
+</code></pre>
+<p>As you can see, this time, the base model correctly parsed the function calls and arguments. It was also able to structure the response with minor errors. While we can get through this by running some adhoc heuristics on the raw response, it is worthwhile to observe the behaviour on running LoRA on some training examples and then comparing it with the raw Base output.</p>
+<h2 id="lora-configuration">LoRA Configuration</h2>
+<p>We will apply LoRA to the following projections</p>
+<pre><code><span class="hljs-string">"q_proj"</span>,
+<span class="hljs-string">"k_proj"</span>,
+<span class="hljs-string">"v_proj"</span>,
+<span class="hljs-string">"o_proj"</span>,
+<span class="hljs-string">"gate_proj"</span>,
+<span class="hljs-string">"up_proj"</span>,
+<span class="hljs-string">"down_proj"</span>
+</code></pre><p>We apply LoRA to the attention mechanism (q,k,v projections and attention output layer) to learn new attention patterns. We also apply LoRA to the Feed Forward layers for further adaptation downstream.</p>
+<p>To be more memory efficient, we will use QLoRA with the following configurations. We choose lora_r=32 with bf16 precision. It is common practice to keep alpha as 2 x rank, so we will keep alpha=64.</p>
+<p>The full configuration set is as follows (SFTTrainer)</p>
+<pre><code><span class="hljs-comment"># LoRA</span>
+<span class="hljs-attr">lora_r</span>=<span class="hljs-number">32</span>,
+<span class="hljs-attr">lora_alpha</span>=<span class="hljs-number">64</span>,
+<span class="hljs-attr">lora_dropout</span>=<span class="hljs-number">0.05</span>,
+
+<span class="hljs-comment"># Training</span>
+<span class="hljs-attr">num_train_epochs</span>=<span class="hljs-number">1</span>,
+<span class="hljs-attr">per_device_train_batch_size</span>=<span class="hljs-number">2</span>,
+<span class="hljs-attr">per_device_eval_batch_size</span>=<span class="hljs-number">2</span>,
+<span class="hljs-attr">gradient_accumulation_steps</span>=<span class="hljs-number">4</span>,
+<span class="hljs-attr">gradient_checkpointing</span>=<span class="hljs-literal">True</span>,
+
+<span class="hljs-attr">completion_only_loss</span>=<span class="hljs-literal">True</span>
+<span class="hljs-attr">learning_rate</span>=<span class="hljs-number">1</span>e-<span class="hljs-number">4</span>,
+<span class="hljs-attr">lr_scheduler_type</span>=”cosine”
+<span class="hljs-attr">max_seq_length</span>=<span class="hljs-number">1024</span>,
+<span class="hljs-attr">warmup_ratio</span>=<span class="hljs-number">0.03</span>,
+<span class="hljs-attr">eval_steps</span>=<span class="hljs-number">100</span>
+</code></pre><p>While the number of epochs was set to 1, we stopped at around 48 % of the training run, after 2900 of 7k steps. We then started evaluation.</p>
+<p>At step=100, </p>
+<ul>
+<li>Training loss = 0.0352</li>
+<li>Validation loss = 0.0472</li>
+</ul>
+<p>At step=2900</p>
+<ul>
+<li>Training loss=0.01956</li>
+<li>Validation loss=0.02986</li>
+</ul>
+<p>Here are the loss curves</p>
+<p><img width="624" height="353" alt="image" src="https://github.com/user-attachments/assets/97a63d82-571d-4b3e-8ec0-9cefad769de3" /></p>
+<p><img width="599" height="346" alt="image" src="https://github.com/user-attachments/assets/f26816c2-22f9-4916-bc3a-ef3d4a6f318d" /></p>
+<p>Interestingly, the training loss fluctuated quite a bit, while the validation loss improved consistently.</p>
+<p>Next, we evaluate the LoRA adapter checkpointed at step=2900. The size of this LoRA adapter is ~300 MB, which showcases the memory efficiency of using LoRA for fine-tuning.</p>
+<h2 id="evaluation">Evaluation</h2>
+<p>Function tool-calling is a task which can be accurately judged based on output structure, tool names and arguments. Hence, there are 3 metrics that we will use to compare the model’s output versus the actual output for a given query.</p>
+<p><strong>JSON Validity</strong></p>
+<p>This checks whether the generated output has a valid JSON structure. This check is strictly enforced, as a broken JSON object can lead to downstream errors during tool chaining.</p>
+<p><strong>Exact JSON Match</strong></p>
+<p>This checks whether the generated output exactly matches the expected output. This includes checking the tools called and the arguments passed to those tools.</p>
+<p><strong>Hallucination Score</strong></p>
+<p>This checks whether the generated output introduces tool names or argument values that do not exist in the query or toolset.</p>
+<p>After executing the inference loop on 100 eval examples using Qwen3-4B-Base and the LoRA-tuned version, we get the following scores</p>
+<pre><code>--- Accuracy <span class="hljs-keyword">Scores </span>---
+<span class="hljs-keyword">Base </span>Model - <span class="hljs-keyword">JSON </span>Validity Accuracy: <span class="hljs-number">63</span>.<span class="hljs-number">37</span>%
+<span class="hljs-keyword">Base </span>Model - Exact <span class="hljs-keyword">JSON </span>Match Accuracy: <span class="hljs-number">0</span>.<span class="hljs-number">00</span>%
+<span class="hljs-keyword">Base </span>Model - Tools Exist Accuracy: <span class="hljs-number">63</span>.<span class="hljs-number">37</span>%
+
+LoRA Model - <span class="hljs-keyword">JSON </span>Validity Accuracy: <span class="hljs-number">100</span>.<span class="hljs-number">00</span>%
+LoRA Model - Exact <span class="hljs-keyword">JSON </span>Match Accuracy: <span class="hljs-number">80</span>.<span class="hljs-number">20</span>%
+LoRA Model - Tools Exist Accuracy: <span class="hljs-number">100</span>.<span class="hljs-number">00</span>%
+</code></pre><p>As we can see, the base model was able to generate a valid JSON for 63 % of the cases. And based on the numbers, it appears that it was able to parse the correct tools. However, none of the base model outputs led to an exact JSON match with the expected output.</p>
+<p>On the other hand, the LoRA tuned version accurately learnt the JSON structure and in over 80% of the cases, there was an exact match with the expected output. There was no hallucination by the LoRA model which means for each example, it always picked the tools and args specified in the query.</p>
+<p>Let us take a look at the generated output for the prompt we used earlier, using the LoRA tuned model.</p>
+<pre><code class="lang-json">[{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.sum_of_multiples"</span>, <span class="hljs-attr">"arguments"</span>: {<span class="hljs-attr">"lower_limit"</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">"upper_limit"</span>: <span class="hljs-number">1000</span>, <span class="hljs-attr">"multiples"</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>]}}, {<span class="hljs-attr">"name"</span>: <span class="hljs-string">"math_toolkit.product_of_primes"</span>, <span class="hljs-attr">"arguments"</span>: {<span class="hljs-attr">"count"</span>: <span class="hljs-number">5</span>}}]
+</code></pre>
+<h4 id="it-is-an-exact-match-">It is an exact match.</h4>
+<h2 id="conclusion">Conclusion</h2>
+<p>Qwen3-4B-Base already shows strong semantic understanding, with modest gains from a
+lightweight system prompt. However, achieving consistent format adherence and reliable 
+argument parsing requires more than prompt engineering alone. 
+LoRA fine-tuning provides that extra control, noticeably improving structural reliability
+while preserving the base model’s behavior.</p>
+<p>While an instruct-tuned model would likely be preferable in production,
+this experiment was scoped to isolate the effect of LoRA.
+We could extend this analysis to smaller Qwen3 variants and different LoRA ranks,
+but even within this limited setup, the impact of LoRA on structured generation is quite evident.</p>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k">https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k</a></li>
+<li><a href="https://arxiv.org/pdf/2409.03215">xLAM: A Family of Large Action Models to Empower AI Agent Systems</a></li>
+<li><a href="https://arxiv.org/abs/2106.09685">LoRA: Low-Rank Adaptation of Large Language Models</a></li>
+<li><a href="https://arxiv.org/abs/2305.14314">QLoRA: Efficient Finetuning of Quantized LLMs</a></li>
+<li><a href="https://arxiv.org/abs/2505.09388">Qwen3 Technical Report</a></li>
+</ul>
