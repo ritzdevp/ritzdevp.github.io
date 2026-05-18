@@ -1,45 +1,47 @@
-/* General styles for the blog */
+/* Blog styles — aligned with main site */
 
 html, body {
-    height: 100%; /* Make sure the body takes the full height */
+    height: 100%;
+    margin: 0;
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Use Roboto font */
-    line-height: 1.6;
-    margin: 0;
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.75;
     padding: 0;
-    background-color: #ffffff; /* White background */
-    color: #333; /* Default text color */
+    background-color: #fafafa;
+    color: #2c2c2c;
+    -webkit-font-smoothing: antialiased;
 }
 
 .container {
     display: flex;
-    flex-direction: column; /* Stack children vertically */
-    min-height: 100vh; /* Make the container at least the height of the viewport */
-    width: 80%;
-    max-width: 800px;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 88%;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: #fff; /* Container background remains white */
+    padding: 40px 20px;
 }
 
+/* Header */
 header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space between title and navigation */
-    padding: 20px 0;
+    justify-content: space-between;
+    padding: 30px 0;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 32px;
 }
 
 h1 {
     margin: 0;
-    color: #2c3e50; /* Dark blue color for blog title */
-    font-weight: 300; /* Use lighter weight for a slimmer appearance */
-}
-
-nav {
-    display: flex;
-    justify-content: flex-end; /* Align navigation to the right */
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+    max-width: 80%;
 }
 
 nav ul {
@@ -48,69 +50,147 @@ nav ul {
     display: flex;
 }
 
-/* Apply lighter font weight to paragraphs */
-p {
-    font-weight: 300; /* Use lighter weight for paragraphs */
-}
-
 nav ul li {
-    margin: 0 20px; /* Space between links */
+    margin: 0 20px;
 }
 
 nav ul li a {
-    text-decoration: none; /* Remove underline from links */
-    color: #3498db; /* Link color */
-    font-weight: 300; /* Use lighter weight for navigation links */
-    transition: color 0.3s ease; /* Smooth transition for hover effect */
+    text-decoration: none;
+    color: #1a6fb5;
+    font-weight: 500;
+    font-size: 0.92rem;
+    transition: color 0.2s ease;
 }
 
 nav ul li a:hover {
-    color: #2c3e50; /* Darker color on hover for a stylish effect */
+    color: #0d4f82;
 }
 
+/* Main */
 main {
-    flex: 1; /* Allow the main content to expand and take available space */
-    padding: 20px 0;
+    flex: 1;
+    padding: 0;
 }
 
 section {
     margin-bottom: 30px;
 }
 
+/* Article */
 article {
-    margin-bottom: 20px; /* Space between blog posts */
+    margin-bottom: 20px;
 }
 
 article h2 {
-    margin: 0; /* Remove margin for the blog post title */
-    color: #007BFF; /* Nice blue color for blog post titles */
-    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+    margin: 32px 0 12px;
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+}
+
+article h3 {
+    margin: 24px 0 10px;
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+article h4 {
+    margin: 20px 0 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
 article p {
-    margin: 5px 0; /* Space between paragraphs */
+    margin: 8px 0;
+    font-weight: 400;
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: #333;
+}
+
+article em {
+    color: #888;
+    font-size: 0.88rem;
 }
 
 article a {
-    text-decoration: none; /* Remove underline from links */
-    color: #3498db; /* Link color */
-    font-weight: 300; /* Use lighter weight for links */
+    text-decoration: none;
+    color: #1a6fb5;
+    font-weight: 400;
+    transition: color 0.2s ease;
 }
 
+article a:hover {
+    color: #0d4f82;
+}
+
+article ul {
+    padding-left: 24px;
+    margin: 10px 0;
+}
+
+article ul li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+article img {
+    max-width: 100%;
+    height: auto;
+    margin: 16px 0;
+}
+
+/* Code blocks */
+pre {
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+code {
+    font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 0.85rem;
+}
+
+p code {
+    background-color: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.85rem;
+}
+
+/* Footer */
 footer {
     text-align: center;
-    padding: 10px 0;
-    font-size: 0.9em;
-    color: #777;
+    padding: 16px 0;
+    font-size: 0.82rem;
+    color: #aaa;
+    margin-top: auto;
+    border-top: 1px solid #eaeaea;
 }
 
-pre {
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px;
-}
-code {
-    font-family: Consolas, Monaco, 'Andale Mono', monospace;
-    font-size: 14px;
+/* Responsive */
+@media (max-width: 600px) {
+    .container {
+        width: 90%;
+        padding: 24px 12px;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    h1 {
+        font-size: 1.25rem;
+        max-width: 100%;
+    }
 }

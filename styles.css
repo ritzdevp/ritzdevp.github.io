@@ -1,193 +1,277 @@
-/* General styles for the portfolio */
-
 html, body {
-    height: 100%; /* Make sure the body takes the full height */
-    margin: 0; /* Remove default margin */
+    height: 100%;
+    margin: 0;
 }
 
 body {
-    font-family: 'Roboto', sans-serif; /* Use Roboto font */
-    line-height: 1.6;
-    background-color: #ffffff; /* White background */
-    color: #333; /* Default text color */
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.75;
+    background-color: #fafafa;
+    color: #2c2c2c;
+    -webkit-font-smoothing: antialiased;
 }
 
 .container {
     display: flex;
-    flex-direction: column; /* Stack children vertically */
-    min-height: 100vh; /* Make the container at least the height of the viewport */
-    width: 80%;
-    max-width: 800px;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 88%;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: #fff; /* Container background remains white */
+    padding: 40px 20px;
 }
 
+/* Header */
 header {
     display: flex;
     align-items: center;
-    padding: 20px 0;
+    padding: 30px 0;
 }
 
 .profile-image {
-    margin-right: 20px;
+    margin-right: 24px;
 }
 
 .profile-image img {
-    width: 180px;  /* Increased width */
-    height: 180px; /* Increased height */
-    object-fit: cover; /* Maintain aspect ratio */
-    border-radius: 0; /* Removed circular border */
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
 }
 
 .header-text {
-    text-align: left; /* Ensure header text is left-aligned */
-    margin-left: 20px; /* Added margin to move text to the right */
+    margin-left: 16px;
 }
 
 h1 {
     margin: 0;
-    color: #2c3e50; /* Original dark blue color for main heading */
-    text-align: left; /* Left-align main heading */
-    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
 }
 
-h2 {
-    color: #333333; /* Original dark gray color for subheadings */
-    margin-bottom: 10px; /* Space below the heading */
-    text-align: left; /* Left-align subheadings */
-    font-weight: 300; /* Use lighter weight for a slimmer appearance */
+.header-text p {
+    color: #444;
+    font-weight: 400;
+    font-size: 0.95rem;
+    margin: 2px 0;
 }
 
-h3 {
-    font-weight: 300; /* Use lighter weight for h3 */
-}
-
-/* Apply lighter font weight to paragraphs */
-p {
-    font-weight: 300; /* Use lighter weight for paragraphs */
-}
-
-nav {
+/* Social links */
+.social-links {
     display: flex;
-    justify-content: center; /* Center the navigation links */
-    margin-bottom: 20px; /* Add some space below the navigation */
+    gap: 14px;
+    margin-left: auto;
+    margin-right: 10px;
 }
 
-nav ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
+.social-links a {
+    color: #888;
+    font-size: 1.35em;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-nav ul li {
-    margin: 0 20px;
+.social-links a:hover {
+    color: #1a1a1a;
 }
 
-nav ul li a {
-    text-decoration: none; /* Remove underline from links */
-    color: #3498db; /* Link color */
-    font-weight: 300; /* Use lighter weight for navigation links */
-    transition: color 0.3s ease; /* Smooth transition for hover effect */
-}
-
-nav ul li a:hover {
-    color: #2c3e50; /* Darker color on hover for a stylish effect */
-}
-
+/* Main */
 main {
-    flex: 1; /* Allow the main content to expand and take available space */
-    padding: 20px 0;
+    flex: 1;
+    padding: 24px 0;
 }
 
 section {
-    margin-bottom: 30px;
+    margin-bottom: 44px;
 }
 
-ul {
-    list-style-type: none; /* Remove bullets from the list */
-    padding-left: 0; /* Remove left padding */
-}
-
-ul li {
-    margin-bottom: 15px; /* Space between list items */
+h2 {
+    color: #1a1a1a;
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
 }
 
 p, ul {
-    text-align: left; /* Left-align paragraphs and lists */
-    margin: 0; /* Remove any margin */
-    max-width: 600px; /* Optional: limit the width of the content */
+    margin: 0;
 }
 
-footer {
-    text-align: center; /* Center the footer text */
-    padding: 10px 0;
-    font-size: 0.9em;
-    color: #777;
-    margin-top: auto; /* Push the footer to the bottom of the container */
-}
-
-/* Styles for blog post headings */
-h3 a {
-    color: #007BFF; /* Nice blue color for blog post titles */
-    text-decoration: none; /* Remove underline from links */
+#about p {
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.85;
+    color: #333;
 }
 
 a {
     text-decoration: none;
+    color: #1a6fb5;
+    transition: color 0.2s ease;
 }
 
-article h3 a:visited {
-    color: #007BFF; /* Keep the same color when visited */
+a:hover {
+    color: #0d4f82;
 }
 
-article h3 a:hover {
-    color: #0056b3; /* Darker blue on hover for a stylish effect */
+/* Blog list */
+ul {
+    list-style-type: none;
+    padding-left: 0;
 }
 
-.social-links {
-    display: flex;
-    gap: 15px; /* Space between icons */
-    margin-left: auto; /* Push social links to the right */
-    margin-right: 20px; /* Add extra space to the right */
-}
-
-.social-links a {
-    color: #3498db; /* Icon color */
-    font-size: 1.5em; /* Icon size */
-    text-decoration: none; /* Remove underline */
-}
-
-.social-links a:hover {
-    color: #2c3e50; /* Darker color on hover */
-}
-
-/* New styles for blog posts */
 #blogs ul li {
-    margin-bottom: 20px;
-    padding-left: 15px; /* Add padding on the left for the shadow */
-    position: relative; /* For positioning the pseudo-element */
-    transition: transform 0.2s ease;
-}
-
-#blogs ul li::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0; /* Align shadow to the left */
-    bottom: 0;
-    width: 5px; /* Width of the shadow */
-    background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0));
+    margin-bottom: 8px;
+    padding: 18px 16px;
+    position: relative;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 #blogs ul li:hover {
-    transform: translateX(5px);
+    border-left-color: #1a6fb5;
+    background-color: #f4f6f8;
 }
 
 #blogs h3 {
-    margin-bottom: 0; /* Remove margin below the heading */
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+#blogs h3 a {
+    color: #1a6fb5;
+}
+
+#blogs h3 a:hover {
+    color: #0d4f82;
 }
 
 #blogs p {
-    margin: 0; /* Remove all margins from paragraphs in the blogs section */
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: #555;
+    margin: 2px 0;
+    line-height: 1.6;
+}
+
+#blogs em {
+    color: #888;
+    font-size: 0.82rem;
+}
+
+#blogs .venue {
+    font-size: 0.84rem;
+    color: #555;
+    font-weight: 500;
+    margin-top: 3px;
+    letter-spacing: 0.01em;
+}
+
+#blogs .venue i {
+    font-size: 0.72rem;
+    color: #999;
+    margin-right: 3px;
+}
+
+.pill {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.pill-blog {
+    color: #1a6fb5;
+    background-color: #e8f1f8;
+}
+
+.pill-talk {
+    color: #b5621a;
+    background-color: #fdf0e6;
+}
+
+.pill-project {
+    color: #1a8a5c;
+    background-color: #e6f5ee;
+}
+
+#blogs .talk-links {
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#blogs .talk-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #555;
+    padding: 4px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+#blogs .talk-links a:hover {
+    color: #1a6fb5;
+    border-color: #1a6fb5;
+}
+
+#blogs .talk-links a i {
+    font-size: 0.85rem;
+}
+
+/* Contact */
+#contact p {
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 16px 0;
+    font-size: 0.82rem;
+    color: #aaa;
+    margin-top: auto;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .profile-image img {
+        width: 130px;
+        height: 130px;
+    }
+
+    .header-text {
+        margin-left: 0;
+    }
+
+    .social-links {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+
+    .container {
+        width: 90%;
+        padding: 24px 12px;
+    }
 }
